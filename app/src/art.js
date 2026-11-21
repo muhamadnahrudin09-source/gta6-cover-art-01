@@ -131,7 +131,7 @@ export function render(canvas, opts) {
   ctx.fill();
   ctx.restore();
 
-  // 4) Palm tree silhouettes in bottom corners
+  // 4) Palm tree silhouettes in bottom corners (drawn after panels or nudged outside)
   drawPalmTrees(ctx, W, H, g.palm);
 
   // 5) Photo panels
@@ -210,7 +210,7 @@ export function render(canvas, opts) {
   // 6) Huge italic lettering: title with white->hot gradient, dark offset block shadow, outline, numeral badge
   ctx.save();
   const titleText = (opts.title || 'VICE').toUpperCase();
-  let titleFontSize = Math.floor(W * 0.13);
+  let titleFontSize = Math.floor(W * 0.12);
   ctx.font = `italic 900 ${titleFontSize}px "Impact", "Arial Black", sans-serif`;
 
   // Auto-fit title width if too wide
@@ -222,7 +222,7 @@ export function render(canvas, opts) {
   }
 
   const titleX = W * 0.08;
-  const titleY = H * 0.76;
+  const titleY = H * 0.72;
 
   // Block shadow
   ctx.fillStyle = '#0a0a0e';
@@ -268,31 +268,33 @@ export function render(canvas, opts) {
   ctx.restore();
   ctx.restore();
 
-  // 7) Caption strip & Tagline
+  // 7) Caption strip & Tagline (two-row when wide or multi-part, fully inside bottom margin)
   ctx.save();
   const captionText = (opts.caption || '').toUpperCase();
   const taglineText = (opts.tagline || '').toUpperCase();
 
   if (captionText || taglineText) {
-    const stripY = H * 0.84;
+    const stripY = H * 0.81;
     const stripX = W * 0.08;
     const maxStripW = W * 0.84;
 
     ctx.font = `bold ${Math.floor(W * 0.032)}px "Impact", sans-serif`;
     const capWidth = ctx.measureText(captionText).width;
-    const tagWidth = taglineText ? ctx.measureText(` // ${taglineText}`).width : 0;
-    const totalTextWidth = capWidth + tagWidth;
+    const tagDisplay = taglineText ? (taglineText.startsWith('—') ? taglineText : `— ${taglineText}`) : '';
+    const tagWidth = tagDisplay ? ctx.measureText(tagDisplay).width : 0;
+    const totalTextWidth = capWidth + (tagWidth ? tagWidth + W * 0.03 : 0);
 
-    if (totalTextWidth > maxStripW || taglineText.length > 18) {
-      // Tagline drops to its own line
-      drawPill(ctx, stripX, stripY, capWidth + W * 0.04, H * 0.06, '#0f0f14', '#ffd700', captionText, W * 0.028);
+    const isWide = (W / H) > 1.2;
+    if (isWide || totalTextWidth > maxStripW || taglineText.length > 18) {
+      // Two-row caption block when wide or long
+      drawPill(ctx, stripX, stripY, Math.min(maxStripW, capWidth + W * 0.04), H * 0.052, '#0f0f14', '#ffd700', captionText, W * 0.025);
       if (taglineText) {
-        drawPill(ctx, stripX, stripY + H * 0.07, tagWidth + W * 0.04, H * 0.045, 'rgba(15,15,20,0.8)', '#00f0ff', taglineText, W * 0.022);
+        drawPill(ctx, stripX, stripY + H * 0.058, Math.min(maxStripW, tagWidth + W * 0.04), H * 0.042, 'rgba(15,15,20,0.85)', '#00f0ff', tagDisplay, W * 0.020);
       }
     } else {
       // Single line pill
       const fullText = taglineText ? `${captionText}  //  ${taglineText}` : captionText;
-      drawPill(ctx, stripX, stripY, Math.min(maxStripW, totalTextWidth + W * 0.06), H * 0.065, '#0f0f14', '#ffd700', fullText, W * 0.028);
+      drawPill(ctx, stripX, stripY, Math.min(maxStripW, totalTextWidth + W * 0.06), H * 0.058, '#0f0f14', '#ffd700', fullText, W * 0.025);
     }
   }
   ctx.restore();
@@ -326,10 +328,10 @@ function drawPalmTrees(ctx, W, H, color) {
   ctx.save();
   ctx.fillStyle = color;
 
-  // Bottom-left palm
-  drawPalm(ctx, W * 0.05, H * 0.85, W * 0.12, H * 0.4, -0.15);
-  // Bottom-right palm
-  drawPalm(ctx, W * 0.92, H * 0.88, W * 0.10, H * 0.35, 0.2);
+  // Bottom-left palm - nudged further left to avoid photo panel overlap
+  drawPalm(ctx, W * 0.02, H * 0.92, W * 0.09, H * 0.35, -0.28);
+  // Bottom-right palm - nudged right
+  drawPalm(ctx, W * 0.98, H * 0.92, W * 0.09, H * 0.35, 0.28);
 
   ctx.restore();
 }

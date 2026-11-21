@@ -1,0 +1,6 @@
+[
+  {"name": "1-cover.jpg", "query": "?shot=cover&photo=pier&caption=Sunset%20Heist&title=SUNSET&grade=sunset&layout=solo&size=1080x1080", "viewport": [1280, 1400]},
+  {"name": "2-editor.jpg", "query": "?photo=pier", "viewport": [1440, 900]},
+  {"name": "3-cover.jpg", "query": "?shot=cover&photo=boulevard&caption=Boulevard%20Queen&title=VICE&grade=vice&layout=duo&size=1080x1350", "viewport": [1280, 1500]},
+  {"name": "4-cover.jpg", "query": "?shot=cover&photo=pier&caption=Neon%20Run&title=NEON&grade=neon&layout=quad&size=1920x1080", "viewport": [1280, 800]}
+]
